@@ -10,8 +10,8 @@ interface MeterType {
   id: string
   name: string
   unit: string
-  icon: string
-  color: string
+  icon: string | null
+  color: string | null
 }
 
 interface Location {
@@ -134,7 +134,13 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
         .single()
 
       if (meterError) throw meterError
-      setMeter(meterData as any)
+      // Supabase returns related fields as arrays, fix the structure
+      const normalizedMeterData = {
+        ...meterData,
+        meter_type: Array.isArray(meterData.meter_type) ? meterData.meter_type[0] : meterData.meter_type,
+        location: Array.isArray(meterData.location) ? meterData.location[0] : meterData.location
+      }
+      setMeter(normalizedMeterData as any)
 
       // Load all readings
       const { data: readingsData, error: readingsError } = await supabase
@@ -164,8 +170,8 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
         setHasHouseholdInfo(!!householdData)
 
         // Load benchmark if household info exists
-        if (householdData && meterData) {
-          await loadBenchmark(meterData.meter_type.id, householdData)
+        if (householdData && normalizedMeterData) {
+          await loadBenchmark(normalizedMeterData.meter_type.id, householdData)
         }
       }
     } catch (error) {
@@ -510,7 +516,7 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
             ← Retour au tableau de bord
           </Link>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border-l-4" style={{ borderColor: meter.meter_type.color }}>
+          <div className="bg-white rounded-lg shadow-sm p-6 border-l-4" style={{ borderColor: meter.meter_type.color || '#3b82f6' }}>
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -703,9 +709,9 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
                     />
                     <Tooltip
                       labelFormatter={(dateStr) => formatDate(dateStr)}
-                      formatter={(value: number | null) => {
-                        if (value === null) return ['Pas de relevé', '']
-                        return [`${value.toFixed(2)} ${meter.meter_type.unit}`, 'Relevé']
+                      formatter={(value: any) => {
+                        if (value === null || value === undefined) return ['Pas de relevé', '']
+                        return [`${Number(value).toFixed(2)} ${meter.meter_type.unit}`, 'Relevé']
                       }}
                     />
                     {/* Season bands in background */}
@@ -722,9 +728,9 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
                     <Line
                       type="monotone"
                       dataKey="value"
-                      stroke={meter.meter_type.color}
+                      stroke={meter.meter_type.color || '#3b82f6'}
                       strokeWidth={2}
-                      dot={{ fill: meter.meter_type.color, r: 3 }}
+                      dot={{ fill: meter.meter_type.color || '#3b82f6', r: 3 }}
                       connectNulls={false}
                     />
                   </LineChart>
@@ -776,9 +782,9 @@ export default function MeterDetailPage({ params }: { params: Promise<{ id: stri
                   <Line
                     type="monotone"
                     dataKey="consumption"
-                    stroke={meter.meter_type.color}
+                    stroke={meter.meter_type.color || '#3b82f6'}
                     strokeWidth={2}
-                    dot={{ fill: meter.meter_type.color, r: 4 }}
+                    dot={{ fill: meter.meter_type.color || '#3b82f6', r: 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>

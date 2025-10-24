@@ -72,6 +72,9 @@ export default function Home() {
 
       const meterStats: MeterStats[] = await Promise.all(
         meters.map(async (meter) => {
+          // Normalize meter_type which may be an array
+          const meterType = Array.isArray(meter.meter_type) ? meter.meter_type[0] : meter.meter_type
+
           const { data: readings } = await supabase
             .from('readings')
             .select('reading_date, value')
@@ -95,9 +98,9 @@ export default function Home() {
           return {
             meter_id: meter.id,
             meter_name: meter.name,
-            meter_type: meter.meter_type.name,
-            meter_type_color: meter.meter_type.color,
-            unit: meter.meter_type.unit,
+            meter_type: meterType?.name || 'Unknown',
+            meter_type_color: meterType?.color || '#3b82f6',
+            unit: meterType?.unit || '',
             latest_value: latest?.value || null,
             latest_date: latest?.reading_date || null,
             previous_value: previous?.value || null,

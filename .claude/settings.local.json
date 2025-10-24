@@ -13,7 +13,10 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit - ConsoFlow v1.0\n\nConsoFlow is a smart meter tracking application built with Next.js 16, TypeScript, and Supabase.\n\nFeatures:\n- Multi-meter tracking (electricity, water, gas, custom)\n- Multi-location support\n- Historical data import\n- Interactive charts with seasonal visualization\n- Consumption benchmarks and household comparisons\n- Landing page with invitation code system\n- Complete authentication system\n- Responsive design with Tailwind CSS\n\nTech stack:\n- Next.js 16 with App Router\n- TypeScript\n- Supabase (PostgreSQL + Auth)\n- Recharts for data visualization\n- Tailwind CSS v4\n\nGenerated with Claude Code (https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git branch -D master)",
+      "Bash(git branch -m master)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

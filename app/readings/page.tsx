@@ -65,7 +65,12 @@ export default function ReadingsPage() {
         .order('name')
 
       if (metersRes.error) throw metersRes.error
-      setMeters(metersRes.data || [])
+      // Normalize meter_type which may be an array
+      const normalizedMeters = (metersRes.data || []).map(meter => ({
+        ...meter,
+        meter_type: Array.isArray(meter.meter_type) ? meter.meter_type[0] : meter.meter_type
+      }))
+      setMeters(normalizedMeters as any)
 
       let query = supabase
         .from('readings')

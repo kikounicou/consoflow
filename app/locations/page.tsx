@@ -57,7 +57,10 @@ export default function LocationsPage() {
       if (editingId) {
         const { error } = await supabase
           .from('locations')
-          .update({ name: formData.name, address: formData.address || null })
+          .update({
+            name: formData.name,
+            address: formData.address || null
+          })
           .eq('id', editingId)
 
         if (error) throw error
